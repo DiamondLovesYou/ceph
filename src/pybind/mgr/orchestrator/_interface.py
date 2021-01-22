@@ -18,6 +18,16 @@ from collections import namedtuple, OrderedDict
 from contextlib import contextmanager
 from functools import wraps
 
+from typing import TypeVar, Generic, List, Optional, Union, Tuple, Iterator, Callable, Any, \
+    Sequence, Dict, cast
+
+try:
+    from typing import Protocol  # Protocol was added in Python 3.8
+except ImportError:
+    class Protocol:  # type: ignore
+        pass
+
+
 import yaml
 
 from ceph.deployment import inventory
@@ -108,8 +118,8 @@ def handle_exception(prefix, perm, func):
     return wrapper_copy
 
 
-def _cli_command(perm):
-    def inner_cli_command(prefix):
+def _cli_command(perm: str) -> InnerCliCommandCallable:
+    def inner_cli_command(prefix: str) -> Callable[[FuncT], FuncT]:
         return lambda func: handle_exception(prefix, perm, func)
     return inner_cli_command
 
